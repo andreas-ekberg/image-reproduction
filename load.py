@@ -60,9 +60,12 @@ def calculateColorAverage(pictureSample):
     return avgRGB
 
 images = loadData200()
-print(images[1])
 
-flattened_images = [image.flatten() for image in images]
+def export_data_images(data_images, filename):
+    with open(filename, 'wb') as file:
+        pickle.dump(data_images, file)
+
+
 
 
 index_table=[]
@@ -72,4 +75,6 @@ for pic in images:
     index_table.append(avgLAB)
 
 np.savetxt('indexArray.csv', index_table, delimiter=',')
+
+export_data_images(images, "data_images.pkl")
 

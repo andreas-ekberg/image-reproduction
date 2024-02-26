@@ -5,43 +5,6 @@ import matplotlib.image as mpimg
 from skimage import io, color
 import math 
 
-def load_cifar10_batch(file_path):
-    with open(file_path, 'rb') as f:
-        batch = pickle.load(f, encoding='bytes')
-    return batch
-
-def load_cifar10_data():
-    data = []
-    labels = []
-
-    for batch_num in range(1, 6):
-        file_path = f'cifar-10-batches-py/data_batch_{batch_num}'
-        batch = load_cifar10_batch(file_path)
-        data.append(batch[b'data'])
-        labels.extend(batch[b'labels'])
-
-    test_batch = load_cifar10_batch('cifar-10-batches-py/test_batch')
-    test_data = test_batch[b'data']
-    test_labels = test_batch[b'labels']
-
-    # Convert data to numpy arrays
-    data = np.concatenate(data)
-    labels = np.array(labels)
-    test_data = np.array(test_data)
-    test_labels = np.array(test_labels)
-
-    return data, labels, test_data, test_labels
-
-# Load CIFAR-10 data
-first_data, labels, test_data, test_labels = load_cifar10_data()
-
-def loadData200():
-    data_images = []
-    for i in range(200):
-        data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
-        data_images.append(data_image)
-    return data_images
-
 def calculateColorAverage(pictureSample):
     avgRed = 0
     avgGreen = 0
@@ -66,47 +29,83 @@ def euclidianLabDif(ogImg, refImg):
     dist = math.sqrt(L_diff+A_diff+B_diff)
     return dist
 
+def load_data_images(filename):
+    with open(filename, 'rb') as file:
+        data_images = pickle.load(file)
+    return data_images
 
 def main():
-    images = loadData200()
-    
-    gnuImg = io.imread("gnu2.jpg")
-    gnuLab = color.rgb2lab(gnuImg)
-    output_img = np.zeros((32, 64, 3))
-    output_images_array = []
-    for part in range(2):
-        skip = part*32
-        testBit = np.zeros((32, 32, 3))
-        for i in range(32):
-            for j in range(32):
-                testBit[i,j] = gnuLab[i+2290,1950+j]
-                #output_img[i,skip+j]= testBit
-        output_images_array.append(testBit)
+    sizeX = 64
+    sizeY = 64
 
-
-    help = calculateColorAverage(output_images_array[0])
-    lab = color.rgb2lab(help)
-
+    images = load_data_images("data_images.pkl")
     index_table = np.loadtxt('indexArray.csv', delimiter=',')
+    gnuImg = io.imread("gnu2.jpg")
+
+    addedPhotosArray = np.zeros((sizeX, sizeY, 3), dtype=int)
+    finalIndex = 0
+
+    output_images_array = []
+
     smallest_diff = math.inf
     smallest_diff_index =[]
-    addedPhotosArray = np.zeros((32, 64, 3), dtype=int)
-    for output_index in range(len(output_images_array)):
+
+    for partY in range(4):
+        skipY = partY*32
+        for partX in range(4):
+            skipX = partX*32
+
+
+            testBit = np.zeros((32, 32, 3))
+            for i in range(32):
+                for j in range(32):
+                    testBit[i,j] = gnuImg[i+skipY,skipX+j]
+                    #output_img[i,skip+j]= testBit
+        
+            output_images_array.append(testBit)
+
+            for i in range(len(index_table)): 
+                dist = euclidianLabDif(color.rgb2lab(calculateColorAverage(testBit)), index_table[i])
+                if(dist < smallest_diff):
+                    #print("found")
+                    index = i
+                    smallest_diff = dist
+
+            smallest_diff_index.append(index)
+
+            for k in range(32):
+                for m in range(32):
+                    addedPhotosArray[k+skipY,m+skipX] = images[smallest_diff_index[finalIndex]][k-skipY,m-skipX]
+            finalIndex += 1
+
+
+    
+    
+    
+    """ for output_index in range(len(output_images_array)):
         for i in range(len(index_table)): 
-            dist = euclidianLabDif(calculateColorAverage(output_images_array[output_index]), index_table[i])
+            dist = euclidianLabDif(color.rgb2lab(calculateColorAverage(output_images_array[output_index])), index_table[i])
             if(dist < smallest_diff):
                 #print("found")
+                index = i
                 smallest_diff = dist
-                smallest_diff_index.append(i)
+        smallest_diff_index.append(index) """
 
-    for i in range(32):
-        for j in range(64):
-            if(j <32):
-                addedPhotosArray[i,j] = images[smallest_diff_index[1]][i,j]
-            else:
-                addedPhotosArray[i,j] = images[smallest_diff_index[1]][i,j-32]
 
-    print(smallest_diff_index)
+
+
+    #print(smallest_diff_index)
+    
+    """ for partY in range(2):
+        skipY = partY*32
+        for partX in range(2):
+            skipX = partX*32
+            for i in range(32):
+                for j in range(32):
+                    addedPhotosArray[i+skipY,j+skipX] = images[smallest_diff_index[finalIndex]][i-skipY,j-skipX]
+            finalIndex += 1 """
+
+    #print(smallest_diff_index)
     #height, width, channels = test.shape
     #plt.text(10, 10, f"Dimensions: {width}x{height}\nChannels: {channels}", color='white', fontsize=8, ha='left', va='top', bbox=dict(facecolor='black', alpha=0.7))
     #print(lab)
