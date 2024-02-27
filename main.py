@@ -34,9 +34,19 @@ def load_data_images(filename):
         data_images = pickle.load(file)
     return data_images
 
+""" def addPhotos():
+    for partY in range(2):
+        skipY = partY*32
+        for partX in range(2):
+            skipX = partX*32
+            for i in range(32):
+                for j in range(32):
+                    addedPhotosArray[i+skipY,j+skipX] = images[smallest_diff_index[finalIndex]][i-skipY,j-skipX]
+            finalIndex += 1 """
+
 def main():
-    sizeX = 64
-    sizeY = 64
+    sizeX = 1024
+    sizeY = 1024
 
     images = load_data_images("data_images.pkl")
     index_table = np.loadtxt('indexArray.csv', delimiter=',')
@@ -50,9 +60,9 @@ def main():
     smallest_diff = math.inf
     smallest_diff_index =[]
 
-    for partY in range(4):
+    for partY in range(32):
         skipY = partY*32
-        for partX in range(4):
+        for partX in range(32):
             skipX = partX*32
 
 
@@ -75,7 +85,7 @@ def main():
 
             for k in range(32):
                 for m in range(32):
-                    addedPhotosArray[k+skipY,m+skipX] = images[smallest_diff_index[finalIndex]][k-skipY,m-skipX]
+                    addedPhotosArray[k+skipY,m+skipX] = images[smallest_diff_index[finalIndex]][k,m]
             finalIndex += 1
 
 
@@ -96,9 +106,9 @@ def main():
 
     #print(smallest_diff_index)
     
-    """ for partY in range(2):
+    """ for partY in range(4):
         skipY = partY*32
-        for partX in range(2):
+        for partX in range(4):
             skipX = partX*32
             for i in range(32):
                 for j in range(32):
@@ -111,6 +121,7 @@ def main():
     #print(lab)
 
     plt.imshow(addedPhotosArray)
+    #plt.imshow(gnuImg)
     plt.axis('off')  # Hide axes
     plt.show()
 
