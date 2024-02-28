@@ -10,6 +10,10 @@ def load_cifar10_batch(file_path):
         batch = pickle.load(f, encoding='bytes')
     return batch
 
+def rgb2int(r,g,b):
+    colorInt = 256*256*r + 256*g + b
+    return colorInt
+
 def load_cifar10_data():
     data = []
     labels = []
@@ -35,29 +39,42 @@ def load_cifar10_data():
 # Load CIFAR-10 data
 first_data, labels, test_data, test_labels = load_cifar10_data()
 
-def loadData200():
-    data_images = []
-    for i in range(200):
+def getSortedArray():
+    sortedArrayInts = []
+    for i in range(len(first_data)):
         data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
-        data_images.append(data_image)
+        data_image_avgRGB = calculateColorAverage(data_image)
+        data_image_int = rgb2int(data_image_avgRGB[0],data_image_avgRGB[1],data_image_avgRGB[2])
+        newItem = np.array([data_image_int,i])
+        sortedArrayInts.append(newItem)
+    sortedArrayInts = np.array(sortedArrayInts)
+    sortedArrayInts = sortedArrayInts[sortedArrayInts[:, 0].argsort()]
+
+    return sortedArrayInts
+
+
+def loadData200():
+    
+    idk = getSortedArray()
+    #print(idk[1])
+    längd = len(idk)
+
+    data_images = []
+    skip = 0
+    for i in range(5):
+        skip += 9998
+        reshaped_image = first_data[round((idk[i+skip])[1])].reshape((3,32,32)).transpose(1,2,0)
+        data_images.append(reshaped_image)
+
+    for i in range(0):
+        reshaped_image = first_data[round((idk[i])[1])].reshape((3,32,32)).transpose(1,2,0)
+        data_images.append(reshaped_image)
+    
     return data_images
 
 
 def calculateColorAverage(pictureSample):
-    avgRed = 0
-    avgGreen = 0
-    avgBlue = 0
-    for x in range(0,32):
-        for y in range(0,32):
-            avgRed+= pictureSample[x][y][0]
-            avgGreen+= pictureSample[x][y][1]
-            avgBlue+= pictureSample[x][y][2]
-    avgRed = avgRed/(32*32)
-    avgGreen =avgGreen/(32*32)
-    avgBlue = avgBlue/(32*32)
-
-    avgRGB = [avgRed, avgGreen, avgBlue]
-    return avgRGB
+    return np.mean(pictureSample,axis=(0,1))
 
 images = loadData200()
 

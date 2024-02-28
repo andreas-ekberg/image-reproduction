@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from skimage import io, color
 import math 
+import progressbar
+
+desired_width = 50
 
 def calculateColorAverage(pictureSample):
     return np.mean(pictureSample,axis=(0,1))
@@ -19,6 +22,13 @@ def load_data_images(filename):
     return data_images
 
 def main():
+    widgets = [
+        ' [', progressbar.Timer(), '] ',
+        progressbar.GranularBar(), ' ',
+        progressbar.Percentage(),
+    ]
+
+
     #Load different data: 
     #   images is the 200 small images
     #   index_table is the table with the average LAB of the 200 small images
@@ -42,40 +52,43 @@ def main():
     #Final image with all the small images
     addedPhotosArray = np.zeros((padHeight, padWidth, 3), dtype=int)
     finalIndex = 0
+    m = round(padHeight/32)
+    progress = 0
 
 
     #Stores all the indexes of the images that are close in LAB
     smallest_diff_index =[]
+    with progressbar.ProgressBar(max_value=m, widgets=widgets) as bar:
+        for partY in range(round(padHeight/32)):
+            skipY = partY*32
+            for partX in range(round(padWidth/32)):
+                skipX = partX*32
+                smallest_diff = math.inf
 
-    for partY in range(round(padHeight/32)):
-        skipY = partY*32
-        for partX in range(round(padWidth/32)):
-            skipX = partX*32
-            smallest_diff = math.inf
+                #This was the double for loop to take a 32x32 section of the original image
+                imageSection = paddedImage[skipY:skipY+32, skipX:skipX+32]
 
-            #This was the double for loop to take a 32x32 section of the original image
-            imageSection = paddedImage[skipY:skipY+32, skipX:skipX+32]
-        
-            for i in range(len(index_table)): 
-                originalImageLab = color.rgb2lab(calculateColorAverage(imageSection))
-                dist = euclidianLabDif(originalImageLab, index_table[i])
-                if(dist < smallest_diff):
-                    index = i
-                    smallest_diff = dist
+                for i in range(len(index_table)): 
+                    originalImageLab = color.rgb2lab(calculateColorAverage(imageSection))
+                    dist = euclidianLabDif(originalImageLab, index_table[i])
+                    if(dist < smallest_diff):
+                        index = i
+                        smallest_diff = dist
 
-            smallest_diff_index.append(index)
+                smallest_diff_index.append(index)
 
-            addedPhotosArray[skipY:skipY+32, skipX:skipX+32] = images[smallest_diff_index[finalIndex]]
-            finalIndex += 1
-        progress = (partY/ round(padHeight/32)) * 100
-        print(f"Progress: {progress:.2f}% done")
+                addedPhotosArray[skipY:skipY+32, skipX:skipX+32] = images[smallest_diff_index[finalIndex]]
+                finalIndex += 1
+            if progress % 1 == 0:
+                bar.update(progress)
+            progress += 1
 
     plt.imshow(addedPhotosArray)
     #plt.imshow(gnuImg)
     plt.axis('off')  # Hide axes
     plt.show()
 
-    # Now, loaded_images is a NumPy array containing the original images
+        # Now, loaded_images is a NumPy array containing the original images
 
 
 
