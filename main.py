@@ -37,7 +37,7 @@ def main():
     index_table = np.loadtxt('indexArray.csv', delimiter=',')
 
     #Load the image and get height and width
-    gnuImg = io.imread("gnu2.jpg")
+    gnuImg = io.imread("simon3.jpg")
     gnuAvg = calculateColorAverage(gnuImg)
     #gnuLAB = color.rgb2lab(gnuAvg)
 

@@ -57,12 +57,11 @@ def loadData200():
     
     idk = getSortedArray()
     #print(idk[1])
-    längd = len(idk)
 
     data_images = []
     skip = 0
-    for i in range(5):
-        skip += 9998
+    for i in range(200):
+        skip += 249
         reshaped_image = first_data[round((idk[i+skip])[1])].reshape((3,32,32)).transpose(1,2,0)
         data_images.append(reshaped_image)
 
