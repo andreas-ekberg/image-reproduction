@@ -19,20 +19,21 @@ def load_data_images(filename):
     return data_images
 
 def main():
-    #Size of the final image
-    sizeX = 3000
-    sizeY = 4000
-
     #Load different data: 
     #   images is the 200 small images
     #   index_table is the table with the average LAB of the 200 small images
     #   gnuImg is the original image   
     images = load_data_images("data_images.pkl")
     index_table = np.loadtxt('indexArray.csv', delimiter=',')
-    
+
     #Load the image and get height and width
-    gnuImg = io.imread("simon.jpg")
+    gnuImg = io.imread("gnu2.jpg")
+    gnuAvg = calculateColorAverage(gnuImg)
+    #gnuLAB = color.rgb2lab(gnuAvg)
+
+    #Get the size of the loaded image
     height, width, channels = gnuImg.shape
+    #Calculate the amout for padding and then pad the image
     Xpadding = width % 32
     Ypadding = height % 32
     paddedImage  = np.pad(gnuImg, ((Ypadding,Ypadding), (Xpadding,Xpadding),(0,0)), "constant", constant_values=0)
@@ -64,11 +65,9 @@ def main():
 
             smallest_diff_index.append(index)
 
-            for k in range(32):
-                for m in range(32):
-                    addedPhotosArray[k+skipY,m+skipX] = images[smallest_diff_index[finalIndex]][k,m]
+            addedPhotosArray[skipY:skipY+32, skipX:skipX+32] = images[smallest_diff_index[finalIndex]]
             finalIndex += 1
-        progress = (partY + 1) / 64 * 100
+        progress = (partY/ round(padHeight/32)) * 100
         print(f"Progress: {progress:.2f}% done")
 
     plt.imshow(addedPhotosArray)
