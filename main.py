@@ -68,7 +68,6 @@ def main():
 
                 #This was the double for loop to take a 32x32 section of the original image
                 imageSection = paddedImage[skipY:skipY+32, skipX:skipX+32]
-
                 for i in range(len(index_table)): 
                     originalImageLab = color.rgb2lab(calculateColorAverage(imageSection))
                     dist = euclidianLabDif(originalImageLab, index_table[i])
