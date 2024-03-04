@@ -87,7 +87,7 @@ def main():
     """ large_image = addedPhotosArray.convert('RGB') """
     """ //addedPhotosArray.save('large_image.jp2', format='JPEG2000') """
     pil_image = Image.fromarray(addedPhotosArray.astype('uint8'), mode='RGB')
-    pil_image.save("large_image.jpg", format="JPEG")
+    pil_image.save("large_image200.jpg", format="JPEG")
 
 
     plt.imshow(addedPhotosArray)
