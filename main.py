@@ -5,6 +5,7 @@ import matplotlib.image as mpimg
 from skimage import io, color
 import math 
 import progressbar
+from PIL import Image
 
 desired_width = 50
 
@@ -82,6 +83,12 @@ def main():
             if progress % 1 == 0:
                 bar.update(progress)
             progress += 1
+
+    """ large_image = addedPhotosArray.convert('RGB') """
+    """ //addedPhotosArray.save('large_image.jp2', format='JPEG2000') """
+    pil_image = Image.fromarray(addedPhotosArray.astype('uint8'), mode='RGB')
+    pil_image.save("large_image.jpg", format="JPEG")
+
 
     plt.imshow(addedPhotosArray)
     #plt.imshow(gnuImg)
