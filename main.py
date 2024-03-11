@@ -38,7 +38,7 @@ def main():
     index_table = np.loadtxt('indexArray.csv', delimiter=',')
 
     #Load the image and get height and width
-    gnuImg = io.imread("simon3.jpg")
+    gnuImg = io.imread("wilma3.jpg")
     gnuAvg = calculateColorAverage(gnuImg)
     #gnuLAB = color.rgb2lab(gnuAvg)
 
@@ -86,7 +86,7 @@ def main():
     """ large_image = addedPhotosArray.convert('RGB') """
     """ //addedPhotosArray.save('large_image.jp2', format='JPEG2000') """
     pil_image = Image.fromarray(addedPhotosArray.astype('uint8'), mode='RGB')
-    pil_image.save("large_image200.jpg", format="JPEG")
+    pil_image.save("wilmaOpt2_200_10colors.jpg", format="JPEG")
 
 
     plt.imshow(addedPhotosArray)

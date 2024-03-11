@@ -37,28 +37,14 @@ first_data, labels, test_data, test_labels = load_cifar10_data()
 
 def loadData200():
     data_images = []
-    for i in range(200):
+    for i in range(50):
         data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
         data_images.append(data_image)
     return data_images
 
 
 def calculateColorAverage(pictureSample):
-    avgRed = 0
-    avgGreen = 0
-    avgBlue = 0
-    color.rgb2
-    for x in range(0,32):
-        for y in range(0,32):
-            avgRed+= pictureSample[x][y][0]
-            avgGreen+= pictureSample[x][y][1]
-            avgBlue+= pictureSample[x][y][2]
-    avgRed = avgRed/(32*32)
-    avgGreen =avgGreen/(32*32)
-    avgBlue = avgBlue/(32*32)
-
-    avgRGB = [avgRed, avgGreen, avgBlue]
-    return avgRGB
+    return np.mean(pictureSample, axis=(0, 1))
 
 images = loadData200()
 
@@ -75,6 +61,7 @@ for pic in images:
     avgLAB = color.rgb2lab(avgRGB)
     index_table.append(avgLAB)
 
+print(len(index_table))
 np.savetxt('indexArray.csv', index_table, delimiter=',')
 
 export_data_images(images, "data_images.pkl")

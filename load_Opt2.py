@@ -4,6 +4,44 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from skimage import io, color
 import math
+from sklearn.cluster import KMeans
+
+def load_ref_image():
+    gnuImg = io.imread("gnu2.jpg")
+    gnuAvg = calculateColorAverage(gnuImg)
+    print("RGB: ", gnuAvg)
+    gnuLAB = color.rgb2lab(gnuAvg)
+    return gnuLAB
+
+def getColorPalette():
+    image = mpimg.imread('wilma3.jpg')
+ 
+    # Get the dimensions (width, height, and depth) of the image
+    w, h, d = tuple(image.shape)
+    
+    # Reshape the image into a 2D array, where each row represents a pixel
+    pixel = np.reshape(image, (w * h, d))
+    
+    # Import the KMeans class from sklearn.cluster
+    
+    # Set the desired number of colors for the image
+    n_colors = 10
+    
+    # Create a KMeans model with the specified number of clusters and fit it to the pixels
+    model = KMeans(n_clusters=n_colors, random_state=42).fit(pixel)
+    
+    # Get the cluster centers (representing colors) from the model
+    colour_palette = np.uint8(model.cluster_centers_)
+
+
+    
+    # Display the color palette as an image
+    plt.imshow([colour_palette])
+    
+    # Show the plot
+    plt.show()
+
+    #return colour_palette
 
 
 def load_cifar10_batch(file_path):
@@ -94,39 +132,68 @@ def euclidianLabDif(ogImg, refImg):
     return dist
 
 
-def loadData():
+def loadData(refAvgLAB):
     data_images = []
-    amountOfPictures = 50
+    amountOfPictures = 200
     wentThrough = 0
     for i in range(len(first_data)):
         data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
-        if len(data_images) == 0:
+        counter = 1
+        dist = abs(
+            euclidianLabDif(
+                refAvgLAB, color.rgb2lab(calculateColorAverage(data_image))
+            )
+        )
+        if dist < 600:
             data_images.append(data_image)
-        else:
-            avgRGB = calculateColorAverage(data_image)
-            avgLAB = color.rgb2lab(avgRGB)
-            counter = 1
-            for addedImg in data_images:
-                dist = abs(
-                    euclidianLabDif(
-                        avgLAB, color.rgb2lab(calculateColorAverage(addedImg))
-                    )
-                )
-                if dist < 1700:
-                    break
-                elif len(data_images) == counter:
-                    data_images.append(data_image)
-                counter += 1
-
-            if len(data_images) == amountOfPictures:
-                print(amountOfPictures, " images are added")
-                break
+        
+        if len(data_images) == amountOfPictures:
+            print(amountOfPictures, " images are added")
+            break
         wentThrough += 1
     print("Went through ", wentThrough, "amount of pictures")
     return data_images
 
+def loadData2(refAvgLAB):
+    data_images = []
+    amountOfPictures = 20
+    wentThrough = 0
+    amountSkip = 1
+    for labPalette in refAvgLAB:
+        for i in range(len(first_data)):
+            data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
+            dist = abs(
+                euclidianLabDif(
+                    labPalette, color.rgb2lab(calculateColorAverage(data_image))
+                )
+            )
+            if dist < 950:
+                data_images.append(data_image)
 
-images = loadData()
+            if len(data_images) == amountOfPictures*amountSkip:
+                print(amountOfPictures, " images are added")
+                break
+            wentThrough += 1
+        print("Went through ", wentThrough, "amount of pictures")
+        wentThrough = 0
+        print("Data Images has size: ", len(data_images))
+        amountSkip += 1
+    return data_images
+
+getColorPalette()
+#color_palette = getColorPalette()
+""" ny_palette = []
+for i in range(len(color_palette)):
+    ny_palette.append(color.rgb2lab(color_palette[i]))
+
+
+
+#avgLAB = load_ref_image()
+#print(avgLAB)
+print(ny_palette)
+
+images = loadData2(ny_palette)
+
 
 
 def export_data_images(data_images, filename):
@@ -144,4 +211,4 @@ print("Length of index table", len(index_table))
 
 np.savetxt("indexArray.csv", index_table, delimiter=",")
 
-export_data_images(images, "data_images.pkl")
+export_data_images(images, "data_images.pkl") """
