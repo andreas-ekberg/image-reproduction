@@ -31,7 +31,6 @@ def load_cifar10_data():
     test_data = test_batch[b"data"]
     test_labels = test_batch[b"labels"]
 
-    # Convert data to numpy arrays
     data = np.concatenate(data)
     labels = np.array(labels)
     test_data = np.array(test_data)
@@ -39,8 +38,6 @@ def load_cifar10_data():
 
     return data, labels, test_data, test_labels
 
-
-# Load CIFAR-10 data
 first_data, labels, test_data, test_labels = load_cifar10_data()
 
 
@@ -60,7 +57,7 @@ def getSortedArray():
     return sortedArrayInts
 
 
-def loadData200():
+""" def loadData200():
 
     idk = getSortedArray()
     # print(idk[1])
@@ -82,7 +79,7 @@ def loadData200():
         )
         data_images.append(reshaped_image)
 
-    return data_images
+    return data_images """
 
 
 def calculateColorAverage(pictureSample):
