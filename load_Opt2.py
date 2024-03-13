@@ -6,13 +6,6 @@ from skimage import io, color
 import math
 from sklearn.cluster import KMeans
 
-def load_ref_image():
-    gnuImg = io.imread("gnu2.jpg")
-    gnuAvg = calculateColorAverage(gnuImg)
-    print("RGB: ", gnuAvg)
-    gnuLAB = color.rgb2lab(gnuAvg)
-    return gnuLAB
-
 def getColorPalette():
     image = mpimg.imread('wilma3.jpg')
     w, h, d = tuple(image.shape)
@@ -22,10 +15,7 @@ def getColorPalette():
     model = KMeans(n_clusters=n_colors, random_state=42).fit(pixel)
     
     # Get the cluster centers
-    colour_palette = np.uint8(model.cluster_centers_)
-
-    """ plt.imshow([colour_palette])
-    plt.show() """
+    colour_palette = model.cluster_centers_
 
     return colour_palette
 
@@ -54,7 +44,7 @@ def load_cifar10_data():
     test_batch = load_cifar10_batch("cifar-10-batches-py/test_batch")
     test_data = test_batch[b"data"]
     test_labels = test_batch[b"labels"]
-    
+
     data = np.concatenate(data)
     labels = np.array(labels)
     test_data = np.array(test_data)
@@ -65,48 +55,6 @@ def load_cifar10_data():
 
 # Load CIFAR-10 data
 first_data, labels, test_data, test_labels = load_cifar10_data()
-
-
-def getSortedArray():
-    sortedArrayInts = []
-    for i in range(len(first_data)):
-        data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
-        data_image_avgRGB = calculateColorAverage(data_image)
-        data_image_int = rgb2int(
-            data_image_avgRGB[0], data_image_avgRGB[1], data_image_avgRGB[2]
-        )
-        newItem = np.array([data_image_int, i])
-        sortedArrayInts.append(newItem)
-    sortedArrayInts = np.array(sortedArrayInts)
-    sortedArrayInts = sortedArrayInts[sortedArrayInts[:, 0].argsort()]
-
-    return sortedArrayInts
-
-
-""" def loadData200():
-
-    idk = getSortedArray()
-    # print(idk[1])
-
-    data_images = []
-    skip = 0
-    for i in range(5):
-        skip += 9999
-        reshaped_image = (
-            first_data[round((idk[i + skip])[1])]
-            .reshape((3, 32, 32))
-            .transpose(1, 2, 0)
-        )
-        data_images.append(reshaped_image)
-
-    for i in range(0):
-        reshaped_image = (
-            first_data[round((idk[i])[1])].reshape((3, 32, 32)).transpose(1, 2, 0)
-        )
-        data_images.append(reshaped_image)
-
-    return data_images """
-
 
 def calculateColorAverage(pictureSample):
     return np.mean(pictureSample, axis=(0, 1))
@@ -121,7 +69,9 @@ def loadData2(refAvgLAB):
     amountOfPictures = 20
     wentThrough = 0
     amountSkip = 1
+    #Goes through the color palette
     for labPalette in refAvgLAB:
+        #For each cluster center in color palette, go through all the images in CIFAR
         for i in range(len(first_data)):
             data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
             dist = abs(
@@ -129,8 +79,8 @@ def loadData2(refAvgLAB):
                     labPalette, color.rgb2lab(calculateColorAverage(data_image))
                 )
             )
-            if dist < 950:
-                data_images.append(data_image)
+            if dist < 950:#The threshold
+                data_images.append(data_image)#Add the image
 
             if len(data_images) == amountOfPictures*amountSkip:
                 print(amountOfPictures, " images are added")
@@ -142,17 +92,10 @@ def loadData2(refAvgLAB):
         amountSkip += 1
     return data_images
 
-getColorPalette()
 color_palette = getColorPalette()
 ny_palette = []
 for i in range(len(color_palette)):
     ny_palette.append(color.rgb2lab(color_palette[i]))
-
-
-
-#avgLAB = load_ref_image()
-#print(avgLAB)
-print(ny_palette)
 
 images = loadData2(ny_palette)
 

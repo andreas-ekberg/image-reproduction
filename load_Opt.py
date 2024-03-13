@@ -41,47 +41,6 @@ def load_cifar10_data():
 first_data, labels, test_data, test_labels = load_cifar10_data()
 
 
-def getSortedArray():
-    sortedArrayInts = []
-    for i in range(len(first_data)):
-        data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
-        data_image_avgRGB = calculateColorAverage(data_image)
-        data_image_int = rgb2int(
-            data_image_avgRGB[0], data_image_avgRGB[1], data_image_avgRGB[2]
-        )
-        newItem = np.array([data_image_int, i])
-        sortedArrayInts.append(newItem)
-    sortedArrayInts = np.array(sortedArrayInts)
-    sortedArrayInts = sortedArrayInts[sortedArrayInts[:, 0].argsort()]
-
-    return sortedArrayInts
-
-
-""" def loadData200():
-
-    idk = getSortedArray()
-    # print(idk[1])
-
-    data_images = []
-    skip = 0
-    for i in range(5):
-        skip += 9999
-        reshaped_image = (
-            first_data[round((idk[i + skip])[1])]
-            .reshape((3, 32, 32))
-            .transpose(1, 2, 0)
-        )
-        data_images.append(reshaped_image)
-
-    for i in range(0):
-        reshaped_image = (
-            first_data[round((idk[i])[1])].reshape((3, 32, 32)).transpose(1, 2, 0)
-        )
-        data_images.append(reshaped_image)
-
-    return data_images """
-
-
 def calculateColorAverage(pictureSample):
     return np.mean(pictureSample, axis=(0, 1))
 
@@ -95,6 +54,8 @@ def loadData():
     data_images = []
     amountOfPictures = 50
     wentThrough = 0
+
+    #Goes through all the pictures loaded from the CIFAR
     for i in range(len(first_data)):
         data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
         if len(data_images) == 0:
@@ -103,16 +64,17 @@ def loadData():
             avgRGB = calculateColorAverage(data_image)
             avgLAB = color.rgb2lab(avgRGB)
             counter = 1
+            #Goes through the array where the chosen images has been added.
             for addedImg in data_images:
                 dist = abs(
                     euclidianLabDif(
                         avgLAB, color.rgb2lab(calculateColorAverage(addedImg))
                     )
                 )
-                if dist < 1700:
+                if dist < 1700: # The threshold
                     break
                 elif len(data_images) == counter:
-                    data_images.append(data_image)
+                    data_images.append(data_image) #Adds to the array of chosen images.
                 counter += 1
 
             if len(data_images) == amountOfPictures:

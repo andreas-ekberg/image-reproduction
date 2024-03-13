@@ -37,7 +37,7 @@ first_data, labels, test_data, test_labels = load_cifar10_data()
 
 def loadData200():
     data_images = []
-    for i in range(50):
+    for i in range(50): #Just saves the wanted amount of images from the start of the array.
         data_image = first_data[i].reshape((3, 32, 32)).transpose(1, 2, 0)
         data_images.append(data_image)
     return data_images

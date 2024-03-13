@@ -23,27 +23,22 @@ def load_data_images(filename):
     return data_images
 
 def main():
+    # Just a progressbar when we load
     widgets = [
         ' [', progressbar.Timer(), '] ',
         progressbar.GranularBar(), ' ',
         progressbar.Percentage(),
     ]
 
-
-    #Load different data: 
-    #   images is the 200 small images
-    #   index_table is the table with the average LAB of the 200 small images
-    #   gnuImg is the original image   
     images = load_data_images("data_images.pkl")
     index_table = np.loadtxt('indexArray.csv', delimiter=',')
 
-    #Load the image and get height and width
+    #Load the image
     gnuImg = io.imread("wilma3.jpg")
-    gnuAvg = calculateColorAverage(gnuImg)
-    #gnuLAB = color.rgb2lab(gnuAvg)
 
     #Get the size of the loaded image
     height, width, channels = gnuImg.shape
+
     #Calculate the amout for padding and then pad the image
     Xpadding = width % 32
     Ypadding = height % 32
@@ -83,18 +78,14 @@ def main():
                 bar.update(progress)
             progress += 1
 
-    """ large_image = addedPhotosArray.convert('RGB') """
-    """ //addedPhotosArray.save('large_image.jp2', format='JPEG2000') """
     pil_image = Image.fromarray(addedPhotosArray.astype('uint8'), mode='RGB')
     pil_image.save("wilmaOpt2_200_10colors.jpg", format="JPEG")
 
 
     plt.imshow(addedPhotosArray)
-    #plt.imshow(gnuImg)
-    plt.axis('off')  # Hide axes
+    plt.axis('off')
     plt.show()
 
-        # Now, loaded_images is a NumPy array containing the original images
 
 
 
